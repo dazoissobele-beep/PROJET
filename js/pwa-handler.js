@@ -44,7 +44,7 @@ function initPWAHandler() {
         console.log('✅ App installée avec succès!');
         deferredPrompt = null;
         hideInstallButton();
-        alert('✅ Apprendre a été installée sur votre écran d\'accueil!');
+        alert('✅ LumiLang a été installée sur votre écran d\'accueil!');
     });
     
     // Vérifier si déjà installée

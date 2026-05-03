@@ -1,7 +1,7 @@
 {
-  "name": "Apprendre - Application d'Apprentissage Mobile",
-  "short_name": "Apprendre",
-  "description": "Maîtrisez les compétences à votre rythme avec Apprendre",
+  "name": "LumiLang - Application d'Apprentissage Mobile",
+  "short_name": "LumiLang",
+  "description": "Maîtrisez le français et le langage avec LumiLang",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

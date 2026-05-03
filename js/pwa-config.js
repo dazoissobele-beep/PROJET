@@ -91,7 +91,7 @@ function addPWAMetaTags() {
         { name: 'theme-color', content: '#667eea' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
-        { name: 'apple-mobile-web-app-title', content: 'Apprendre' }
+        { name: 'apple-mobile-web-app-title', content: 'LumiLang' }
     ];
 
     metaTags.forEach(tag => {
