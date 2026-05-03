@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprendre - Application d'Apprentissage Mobile</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- AOS.js -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Apprendre">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='96' y='120' font-size='120' fill='white' text-anchor='middle' font-weight='bold'>🎓</text></svg>">
+    
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-400 via-pink-300 to-blue-300">
+    <!-- Onboarding Screen -->
+    <div id="onboardingScreen" class="fixed inset-0 z-50 bg-white overflow-y-auto hidden">
+        <div class="min-h-screen flex flex-col items-center justify-center px-4 pb-20">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8 animate__animated animate__fadeInDown">
+                <div class="text-6xl mb-4">🎓</div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Apprendre</h1>
+                <p class="text-gray-600">Maîtrisez les compétences à votre rythme</p>
+            </div>
+
+            <!-- Form Container -->
+            <div class="w-full max-w-md animate__animated animate__fadeInUp">
+                <div class="bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+                    <!-- Name Input -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-user mr-2 text-blue-500"></i>Quel est ton prénom ?
+                        </label>
+                        <input 
+                            type="text" 
+                            id="userNameInput" 
+                            placeholder="Ex: Marie"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 transition-colors text-lg"
+                        >
+                    </div>
+
+                    <!-- Avatar Selection -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-smile mr-2 text-yellow-500"></i>Choisis ton avatar
+                        </label>
+                        <div class="grid grid-cols-4 gap-3" id="avatarGrid">
+                            <!-- Avatars will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Selected Avatar Display -->
+                    <div class="text-center py-4 bg-blue-50 rounded-2xl">
+                        <p class="text-sm text-gray-600 mb-2">Avatar sélectionné</p>
+                        <div id="selectedAvatarDisplay" class="text-5xl">😊</div>
+                    </div>
+
+                    <!-- Difficulty Level Selection -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-graduation-cap mr-2 text-purple-500"></i>Quel est ton niveau?
+                        </label>
+                        <div class="grid grid-cols-2 gap-3" id="difficultyGrid">
+                            <!-- Difficulty levels will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Install Button (PWA) -->
+                    <button 
+                        id="installButton"
+                        onclick="handleInstallClick()"
+                        class="hidden w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3 rounded-2xl text-base transition-transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center"
+                    >
+                        <i class="fas fa-download mr-2"></i>Installer l'app
+                    </button>
+
+                    <!-- Start Button -->
+                    <button 
+                        id="startBtn"
+                        class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 rounded-2xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i class="fas fa-rocket mr-2"></i>Commencer l'aventure
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appScreen" class="fixed inset-0 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 hidden">
+        <!-- Content Area (with bottom nav padding) -->
+        <div id="contentArea" class="h-full overflow-y-auto pb-24">
+            <!-- Home Screen -->
+            <div id="homeScreen" class="min-h-screen p-4 md:p-6">
+                <div class="max-w-2xl mx-auto">
+                    <!-- Header with User Info -->
+                    <div class="mb-8 animate__animated animate__fadeInDown">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-gray-600 text-sm">Bienvenue!</p>
+                                <h1 class="text-3xl md:text-4xl font-bold text-gray-800" id="homeGreeting">Bonjour! 👋</h1>
+                            </div>
+                            <div class="text-5xl" id="homeUserAvatar">😊</div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-3 gap-3 mb-8" data-aos="fade-up" data-aos-delay="100">
+                        <!-- XP Card -->
+                        <div class="bg-gradient-to-br from-yellow-300 to-orange-400 rounded-2xl p-4 text-white shadow-lg hover:scale-105 transition-transform">
+                            <div class="text-2xl mb-2">⭐</div>
+                            <p class="text-2xl font-bold" id="xpDisplay">0</p>
+                            <p class="text-xs opacity-90">Points XP</p>
+                        </div>
+
+                        <!-- Badges Card -->
+                        <div class="bg-gradient-to-br from-pink-300 to-rose-400 rounded-2xl p-4 text-white shadow-lg hover:scale-105 transition-transform">
+                            <div class="text-2xl mb-2">🏅</div>
+                            <p class="text-2xl font-bold" id="badgesDisplay">0</p>
+                            <p class="text-xs opacity-90">Badges</p>
+                        </div>
+
+                        <!-- Streak Card -->
+                        <div class="bg-gradient-to-br from-red-300 to-pink-400 rounded-2xl p-4 text-white shadow-lg hover:scale-105 transition-transform">
+                            <div class="text-2xl mb-2">🔥</div>
+                            <p class="text-2xl font-bold" id="streakDisplay">0</p>
+                            <p class="text-xs opacity-90">Jour streak</p>
+                        </div>
+                    </div>
+
+                    <!-- Progress Message -->
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-6 mb-8 shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm opacity-90">Prêt(e) à apprendre ?</p>
+                                <p class="text-xl font-bold">Continue ta progression</p>
+                            </div>
+                            <div class="text-3xl">📚</div>
+                        </div>
+                        <button onclick="navigateTo('lessonsScreen')" class="mt-4 bg-white text-blue-600 font-bold px-6 py-2 rounded-full w-full hover:bg-blue-50 transition-colors">
+                            Accéder aux leçons <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="bg-white rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="font-bold text-gray-800 mb-4">Résumé rapide</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Leçons complétées</span>
+                                <span class="font-bold text-lg" id="completedLessonsHome">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Leçons en cours</span>
+                                <span class="font-bold text-lg" id="inProgressLessonsHome">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Leçons verrouillées</span>
+                                <span class="font-bold text-lg" id="lockedLessonsHome">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lessons Screen -->
+            <div id="lessonsScreen" class="min-h-screen p-4 md:p-6 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Header -->
+                    <div class="mb-8 animate__animated animate__fadeInDown">
+                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                            <i class="fas fa-book-open mr-3 text-blue-500"></i>Les Leçons
+                        </h1>
+                        <p class="text-gray-600">Clique sur une leçon pour commencer</p>
+                    </div>
+
+                    <!-- Themes Tabs -->
+                    <div class="mb-6 overflow-x-auto pb-2">
+                        <div class="flex gap-2" id="themesContainer">
+                            <!-- Themes will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Lessons Grid by Theme -->
+                    <div id="lessonsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Lessons will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges Screen -->
+            <div id="badgesScreen" class="min-h-screen p-4 md:p-6 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Header -->
+                    <div class="mb-8 animate__animated animate__fadeInDown">
+                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                            <i class="fas fa-trophy mr-3 text-yellow-500"></i>Badges & Statistiques
+                        </h1>
+                        <p class="text-gray-600">Débloque tous les badges disponibles</p>
+                    </div>
+
+                    <!-- XP Progress Bar -->
+                    <div class="bg-white rounded-2xl p-6 shadow-md mb-8" data-aos="fade-up">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="font-bold text-gray-800">Expérience</span>
+                            <span class="text-sm font-bold text-blue-600" id="xpProgressText">0/100</span>
+                        </div>
+                        <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div id="xpProgressBar" class="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Badges Grid -->
+                    <div id="badgesContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Badges will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lesson Player Screen -->
+            <div id="lessonPlayerScreen" class="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 hidden overflow-y-auto">
+                <div id="lessonPlayerContent" class="max-w-3xl mx-auto pb-32">
+                    <!-- Content will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Profile Screen -->
+            <div id="profileScreen" class="min-h-screen p-4 md:p-6 hidden">
+                <div class="max-w-2xl mx-auto">
+                    <!-- Header -->
+                    <div class="mb-8 animate__animated animate__fadeInDown">
+                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                            <i class="fas fa-user mr-3 text-purple-500"></i>Mon Profil
+                        </h1>
+                    </div>
+
+                    <!-- Profile Card -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8" data-aos="fade-up">
+                        <div class="text-center mb-6">
+                            <div id="profileAvatar" class="text-7xl mb-4">😊</div>
+                            <h2 id="profileName" class="text-3xl font-bold text-gray-800">Nom</h2>
+                            <p class="text-gray-600 mt-2" id="profileJoinDate">Inscrit depuis...</p>
+                        </div>
+
+                        <!-- Edit Name Section -->
+                        <div class="space-y-4 border-t pt-6">
+                            <label class="block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-edit mr-2 text-blue-500"></i>Modifier ton nom
+                            </label>
+                            <div class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    id="newNameInput"
+                                    placeholder="Nouveau nom"
+                                    class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
+                                >
+                                <button 
+                                    id="updateNameBtn"
+                                    class="bg-blue-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-600 transition-colors"
+                                >
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Summary -->
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 mb-8" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="font-bold text-gray-800 mb-4">Statistiques Personnelles</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white rounded-xl p-4 text-center">
+                                <div class="text-3xl font-bold text-blue-600" id="profileXP">0</div>
+                                <p class="text-sm text-gray-600 mt-2">Points XP</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center">
+                                <div class="text-3xl font-bold text-pink-600" id="profileBadges">0</div>
+                                <p class="text-sm text-gray-600 mt-2">Badges</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center">
+                                <div class="text-3xl font-bold text-orange-600" id="profileStreak">0</div>
+                                <p class="text-sm text-gray-600 mt-2">Jour streak</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center">
+                                <div class="text-3xl font-bold text-green-600" id="profileLessons">0</div>
+                                <p class="text-sm text-gray-600 mt-2">Leçons</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="font-bold text-red-700 mb-4">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Zone Dangereuse
+                        </h3>
+                        <p class="text-gray-700 mb-4">Réinitialiser l'application effacera toutes tes données.</p>
+                        <button 
+                            id="resetBtn"
+                            class="w-full bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition-colors"
+                        >
+                            <i class="fas fa-trash mr-2"></i>Réinitialiser l'App
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 shadow-2xl z-40">
+            <div class="max-w-2xl mx-auto px-4 py-3 flex justify-around">
+                <!-- Home Button -->
+                <button 
+                    onclick="navigateTo('homeScreen')" 
+                    class="nav-btn flex-1 flex flex-col items-center py-2 rounded-lg transition-all nav-active"
+                    data-screen="homeScreen"
+                >
+                    <i class="fas fa-home text-2xl mb-1"></i>
+                    <span class="text-xs font-semibold">Accueil</span>
+                </button>
+
+                <!-- Lessons Button -->
+                <button 
+                    onclick="navigateTo('lessonsScreen')" 
+                    class="nav-btn flex-1 flex flex-col items-center py-2 rounded-lg transition-all"
+                    data-screen="lessonsScreen"
+                >
+                    <i class="fas fa-book text-2xl mb-1"></i>
+                    <span class="text-xs font-semibold">Leçons</span>
+                </button>
+
+                <!-- Badges Button -->
+                <button 
+                    onclick="navigateTo('badgesScreen')" 
+                    class="nav-btn flex-1 flex flex-col items-center py-2 rounded-lg transition-all"
+                    data-screen="badgesScreen"
+                >
+                    <i class="fas fa-trophy text-2xl mb-1"></i>
+                    <span class="text-xs font-semibold">Badges</span>
+                </button>
+
+                <!-- Profile Button -->
+                <button 
+                    onclick="navigateTo('profileScreen')" 
+                    class="nav-btn flex-1 flex flex-col items-center py-2 rounded-lg transition-all"
+                    data-screen="profileScreen"
+                >
+                    <i class="fas fa-user text-2xl mb-1"></i>
+                    <span class="text-xs font-semibold">Profil</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/indexeddb.js"></script>
+    <script src="js/pwa-handler.js"></script>
+    <script src="js/speech-handler.js"></script>
+    <script src="js/onboarding.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/lesson-content.js"></script>
+    <script src="js/lesson-player.js"></script>
+    <script src="js/lessons.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

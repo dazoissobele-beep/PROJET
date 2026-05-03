@@ -1,0 +1,168 @@
+/**
+ * Custom Styles
+ * Styles personnalisés pour l'application
+ */
+
+/* Variables de couleur */
+:root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --accent: #f093fb;
+    --success: #48bb78;
+    --warning: #f6ad55;
+    --danger: #f56565;
+    --light-bg: #f7f7f7;
+    --border-radius: 16px;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Buttons */
+button {
+    border: none;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* Inputs */
+input, textarea, select {
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input::placeholder {
+    color: #cbd5e0;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Container Responsiveness */
+@media (max-width: 768px) {
+    :root {
+        --border-radius: 12px;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Animations de chargement */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.loading {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(
+        to right,
+        #f0f0f0 8%,
+        #f8f8f8 18%,
+        #f0f0f0 33%
+    );
+    background-size: 800px 104px;
+}
+
+/* Transition smooth */
+* {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+button, a, input {
+    transition: all 0.3s ease;
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* Dark mode (future) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light-bg: #1a202c;
+    }
+
+    body {
+        color: #e2e8f0;
+    }
+
+    input {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+}
