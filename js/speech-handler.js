@@ -9,17 +9,37 @@ let currentUtterance = null;
 /**
  * Obtient les voix disponibles (français prioritaire)
  */
-function getAvailableVoices() {
-    const voices = speechSynthesis.getVoices();
-    
-    // Chercher d'abord une voix française
-    let frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
-    
-    // Sinon utiliser la voix par défaut
-    if (!frenchVoice) {
-        frenchVoice = voices[0];
+function findFrenchVoice(voices) {
+    if (!voices || voices.length === 0) {
+        return null;
     }
-    
+
+    const normalized = voice => {
+        const lang = voice.lang ? voice.lang.toLowerCase() : '';
+        const name = voice.name ? voice.name.toLowerCase() : '';
+        const uri = voice.voiceURI ? voice.voiceURI.toLowerCase() : '';
+        return { lang, name, uri };
+    };
+
+    let frenchVoice = voices.find(voice => {
+        const { lang } = normalized(voice);
+        return lang.startsWith('fr');
+    });
+
+    if (!frenchVoice) {
+        frenchVoice = voices.find(voice => {
+            const { name, uri } = normalized(voice);
+            return name.includes('french') || uri.includes('french');
+        });
+    }
+
+    return frenchVoice;
+}
+
+function getAvailableVoices() {
+    const voices = speechSynthesis.getVoices() || [];
+    const frenchVoice = findFrenchVoice(voices);
+
     return { frenchVoice, allVoices: voices };
 }
 
@@ -134,19 +154,51 @@ function isSpeechAvailable() {
 }
 
 /**
+ * Tente de charger les voix disponibles et de sélectionner une voix française.
+ */
+function loadVoices() {
+    const voices = speechSynthesis.getVoices() || [];
+
+    if (voices.length > 0) {
+        return voices;
+    }
+
+    return new Promise(resolve => {
+        const voicesChangedHandler = () => {
+            const loaded = speechSynthesis.getVoices() || [];
+            if (loaded.length > 0) {
+                speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+                resolve(loaded);
+            }
+        };
+
+        speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+
+        // Défaut après un court délai si l'événement ne se déclenche pas
+        setTimeout(() => {
+            speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+            resolve(speechSynthesis.getVoices() || []);
+        }, 500);
+    });
+}
+
+/**
  * Initialise le gestionnaire de parole
  */
-function initSpeechHandler() {
+async function initSpeechHandler() {
     if (!isSpeechAvailable()) {
         console.warn('⚠️ Web Speech API non disponible dans ce navigateur');
         return false;
     }
-    
-    // Charger les voix quand elles sont disponibles
-    speechSynthesis.onvoiceschanged = () => {
+
+    // Charger les voix dès que possible
+    await loadVoices();
+
+    // Réagir aux changements de voix (certaines plateformes les chargent tardivement)
+    speechSynthesis.addEventListener('voiceschanged', () => {
         getAvailableVoices();
-    };
-    
+    });
+
     console.log('✅ Speech Handler initialisé');
     return true;
 }
