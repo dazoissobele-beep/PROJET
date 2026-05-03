@@ -20,6 +20,7 @@ async function initOnboarding() {
     // Si l'utilisateur existe, affiche l'app
     if (user && user.onboardingDone) {
         showAppScreen();
+        await initApp();
         return;
     }
 
@@ -61,8 +62,8 @@ function renderAvatarGrid() {
         </button>
     `).join('');
 
-    // Sélectionne le premier avatar par défaut
-    selectAvatar(AVATARS[0]);
+    // Sélectionne l'avatar stocké ou le premier avatar par défaut
+    selectAvatar(localStorage.getItem('selectedAvatar') || AVATARS[0]);
 }
 
 /**
@@ -83,8 +84,8 @@ function renderDifficultyGrid() {
         </button>
     `).join('');
 
-    // Sélectionne le niveau débutant par défaut
-    selectDifficulty('beginner');
+    // Sélectionne le niveau stocké ou le niveau débutant par défaut
+    selectDifficulty(localStorage.getItem('selectedDifficulty') || 'beginner');
 }
 
 /**
@@ -100,8 +101,8 @@ function selectAvatar(avatar) {
     document.querySelector(`[data-avatar="${avatar}"]`).classList.add('ring-4', 'ring-blue-500', 'bg-blue-200');
     document.getElementById('selectedAvatarDisplay').textContent = avatar;
 
-    // Stockage dans sessionStorage pour la sauvegarde
-    sessionStorage.setItem('selectedAvatar', avatar);
+    // Stockage persistant pour que la sélection survive à la fermeture
+    localStorage.setItem('selectedAvatar', avatar);
 }
 
 /**
@@ -116,8 +117,8 @@ function selectDifficulty(difficulty) {
 
     document.querySelector(`[data-difficulty="${difficulty}"]`).classList.add('ring-4', 'ring-purple-500', 'bg-purple-200');
 
-    // Stockage dans sessionStorage pour la sauvegarde
-    sessionStorage.setItem('selectedDifficulty', difficulty);
+    // Stockage persistant pour que la sélection survive à la fermeture
+    localStorage.setItem('selectedDifficulty', difficulty);
 }
 
 /**
@@ -135,9 +136,8 @@ function setupOnboardingHandlers() {
     // Gère le clic sur le bouton Start
     startBtn.addEventListener('click', async () => {
         const name = nameInput.value.trim();
-        const avatar = sessionStorage.getItem('selectedAvatar') || AVATARS[0];
-        const difficulty = sessionStorage.getItem('selectedDifficulty') || 'beginner';
-
+    const avatar = localStorage.getItem('selectedAvatar') || AVATARS[0];
+    const difficulty = localStorage.getItem('selectedDifficulty') || 'beginner';
         if (!name) {
             alert('Veuillez entrer votre nom');
             return;
